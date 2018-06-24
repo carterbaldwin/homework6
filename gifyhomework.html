@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Giphy Homework</title>
+</head>
+
+<body>
+  
+  <div id="buttons-go-here">
+
+
+  </div>
+
+    <div class="form-group">
+    <label for="new-topic" class="font-weight-bold"></label>
+    <input type="input" class="form-control" id="new-topic">
+    <button class="new-topic-button">Enter a new search</button>
+    
+</div>
+
+ 
+
+  <div id="gifs-appear-here">
+  </div>
+
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script type="text/javascript">
+    
+
+    var topicArray = ["bird", "horse", "cat", "dog"];
+    console.log("program run")
+
+
+   
+
+    
+    //dynamically create buttons
+     $(".new-topic-button").on("click", function() {
+        var newTopic = $("#new-topic").val();
+        topicArray.push(newTopic);
+        console.log("new button")
+
+
+            createButtons();
+        
+
+     });
+
+     //create button list
+    function createButtons (){
+    
+        //$("#buttons-go-here").empty();
+        console.log("create buttons")
+
+        for (var i = 0; i < topicArray.length; i++) {
+        
+            var newButton = $("<button>");
+            newButton.addClass("gif-button");
+            
+            newButton.attr("data-topic", topicArray[i]);
+            newButton.text(topicArray[i]);
+            $("#buttons-go-here").append(newButton);
+
+           
+        }
+
+
+    }  
+
+        
+    createButtons();
+
+    // get gifs on button click
+    $(".gif-button").on("click", function() {
+
+        $("#gifs-appear-here").empty();
+
+      var topic = $(this).attr("data-topic");
+      console.log(this)
+
+      var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
+        topic + "&api_key=dc6zaTOxFJmzC&limit=10";
+
+      // Performing our AJAX GET request
+      $.ajax({
+        url: queryURL,
+        method: "GET"
+      })
+
+        .then(function(response) {
+ 
+           var results = response.data;
+
+          for (var i = 0; i < results.length; i++) {
+
+            if (results[i].rating !== "r" && results[i].rating !== "pg-13") {
+              // Creating a div with the class "item"
+              var gifDiv = $("<div class='item'>");
+
+              // Storing the result item's rating
+              var rating = results[i].rating;
+
+              // Creating a paragraph tag with the result item's rating
+              var p = $("<p>").text("Rating: " + rating);
+
+              // Creating an image tag
+              var image = $("<img>");
+
+              
+              image.attr("src", results[i].images.fixed_height_still.url);
+              image.attr({"still":results[i].images.fixed_height_still.url, "animate":results[i].images.fixed_height.url, "dataState":"stillImage", "class":"gifClick"});
+             
+
+              image.addClass("gifClick")
+
+              console.log(image)
+              console.log(this)
+              console.log(results[i])
+
+
+              // Appending the paragraph and personImage we created to the "gifDiv" div we created
+              gifDiv.append(p);
+              gifDiv.append(image);
+
+              // Prepending the gifDiv to the "#gifs-appear-here" div in the HTML
+              $("#gifs-appear-here").prepend(gifDiv);
+            }
+          }
+        });
+    });
+
+    //gif pausing and starting
+
+    $(".gifClick").on("click", function() {
+
+        console.log("clicking")
+      
+      var state = $(this).attr("src");
+      var still = $(this).attr("still");
+      var animate = $(this).attr("animate");
+      
+      if (state === still) {
+        $(this).attr("src", $(this).attr("animate"));
+        
+      } 
+      
+      else {
+        $(this).attr("src", $(this).attr("still"));
+        
+      }
+
+      
+    });
+
+
+    
+
+  </script>
+</body>
+
+</html>
